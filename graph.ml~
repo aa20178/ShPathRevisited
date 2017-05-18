@@ -1,0 +1,1408 @@
+        OCaml version 4.02.3
+module Int =
+  struct
+    type t = int 
+    let compare = fun x y -> x - y
+  end ;;
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t ;;
+
+type 'a avl =
+  |V2
+  |N2 of ('a avl * 'a * 'a avl * int) ;;
+
+
+type ('a,'b) pmap =
+  | Empty
+  | Node of ( ('a,'b) pmap * 'a * 'b * ('a,'b) pmap * int )
+;;
+
+let rec ajoute a x = match a with 
+|V -> N(x,V,V) 
+|N(r,fg,fd) -> let res = Pervasives.compare x r in if (res = 0) 
+					then a 
+					else if (res < 0)
+					then N(r,ajoute fg x,fd)
+					else N(r,fg,ajoute fd x) ;;
+
+let rec mem a x = match a with
+|V -> false
+|N(r,fg,fd) -> let res = Pervasives.compare r x in if (res = 0) 
+					then true 
+					else if (res < 0)
+					then mem fg x
+					else mem fd x ;;
+
+let rec remove_min a = match a with
+| V -> failwith("Not Found") 
+| N(r,V,fd) -> (r,fd)
+| N(r,fg,fd) -> let (m,fg') = remove_min fg in (m,N(r,fg',fd)) ;;
+
+type 'a graph = ('a, 'a avl) pmap;;
+
+let pempty = Empty
+;;
+
+let pis_empty x = x= Empty
+;;
+
+let add_vertex v g =
+	if pmap_mem v g
+	then g
+	else pmap_add v avl_empty g  let add_arc k v g =
+  add_p k (add v (find_p k g)) g;;
+  
+let nope = add_arc "a" "w" ( add_arc "z" "a" (add_vertex "w" (add_vertex "z" (add_vertex "a" empty))));;
+
+let existe_arc k v g =
+  appartient v (find_p k g);;
+
+
+type 'a graph = ('a, 'a avl) pmap;;
+
+let pempty = Empty
+;;
+
+let pis_empty x = x= Empty
+;;
+
+let add_vertex v g =
+	if pmap_mem v g
+	then g
+	else pmap_add v avl_empty g  let add_arc k v g =
+  add_p k (add v (find_p k g)) g;;
+  
+let nope = add_arc "a" "w" ( add_arc "z" "a" (add_vertex "w" (add_vertex "z" (add_vertex "a" empty))));;
+
+let existe_arc k v g =
+  appartient v (find_p k g);;
+
+
+let rec fold_tree f a acc =
+  match a with
+  |Empty -> acc
+  |Node(g, x, d, _) -> fold_tree f g (f x (fold_tree f d (acc)));;
+
+let rec fold_tree f a acc =
+  match a with
+  |Empty -> acc
+  |Node(g, x, d, _) -> fold_tree f g (f x (fold_tree f d (acc)));;
+
+Findlib has been successfully loaded. Additional directives:
+  #require "package";;      to load a package
+  #list;;                   to list the available packages
+  #camlp4o;;                to load camlp4 (standard syntax)
+  #camlp4r;;                to load camlp4 (revised syntax)
+  #predicates "p,q,...";;   to set these predicates
+  Topfind.reset();;         to force that packages will be reloaded
+  #thread;;                 to enable threads
+
+#         module Int : sig type t = int val compare : int -> int -> int end
+#   module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+#       type 'a avl = V2 | N2 of ('a avl * 'a * 'a avl * int)
+#           type ('a, 'b) pmap =
+    Empty
+  | Node of (('a, 'b) pmap * 'a * 'b * ('a, 'b) pmap * int)
+#               Characters 37-38:
+  |V -> N(x,V,V) 
+   ^
+Error: Unbound constructor V
+#               Characters 33-34:
+  |V -> false
+   ^
+Error: Unbound constructor V
+#         Characters 39-40:
+  | V -> failwith("Not Found") 
+    ^
+Error: Unbound constructor V
+#   type 'a graph = ('a, 'a avl) pmap
+#     val pempty : ('a, 'b) pmap = Empty
+#     val pis_empty : ('a, 'b) pmap -> bool = <fun>
+#           Characters 26-34:
+  	if pmap_mem v g
+      ^^^^^^^^
+Error: Unbound value pmap_mem
+#   Characters 14-21:
+  let nope = add_arc "a" "w" ( add_arc "z" "a" (add_vertex "w" (add_vertex "z" (add_vertex "a" empty))));;
+             ^^^^^^^
+Error: Unbound value add_arc
+#     Characters 26-36:
+    appartient v (find_p k g);;
+    ^^^^^^^^^^
+Error: Unbound value appartient
+#     type 'a graph = ('a, 'a avl) pmap
+#     val pempty : ('a, 'b) pmap = Empty
+#     val pis_empty : ('a, 'b) pmap -> bool = <fun>
+#           Characters 26-34:
+  	if pmap_mem v g
+      ^^^^^^^^
+Error: Unbound value pmap_mem
+#   Characters 14-21:
+  let nope = add_arc "a" "w" ( add_arc "z" "a" (add_vertex "w" (add_vertex "z" (add_vertex "a" empty))));;
+             ^^^^^^^
+Error: Unbound value add_arc
+#     Characters 26-36:
+    appartient v (find_p k g);;
+    ^^^^^^^^^^
+Error: Unbound value appartient
+#           Characters 68-80:
+    |Node(g, x, d, _) -> fold_tree f g (f x (fold_tree f d (acc)));;
+         ^^^^^^^^^^^^
+Error: This pattern matches values of type 'a * 'b * 'c * 'd
+       but a pattern was expected which matches values of type
+         ('e, 'f) pmap * 'e * 'f * ('e, 'f) pmap * int
+#         Characters 67-79:
+    |Node(g, x, d, _) -> fold_tree f g (f x (fold_tree f d (acc)));;
+         ^^^^^^^^^^^^
+Error: This pattern matches values of type 'a * 'b * 'c * 'd
+       but a pattern was expected which matches values of type
+         ('e, 'f) pmap * 'e * 'f * ('e, 'f) pmap * int
+# module Int =
+  struct
+    type t = int 
+    let compare = fun x y -> x - y
+  end ;;
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t;;
+        module Int : sig type t = int val compare : int -> int -> int end
+#   module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+# module Int =
+  struct
+    type t = int 
+    let compare = fun x y -> x - y
+  end ;;
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t;;
+        module Int : sig type t = int val compare : int -> int -> int end
+#   module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+# module Int = struct
+  type t = int
+  let compare = fun x y -> x-y
+end ;;
+
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t ;;
+
+let range a b = match 
+
+
+let range a b = match;;
+      module Int : sig type t = int val compare : int -> int -> int end
+#     module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+#         Characters 47-49:
+  let range a b = match;;
+                       ^^
+Error: Syntax error
+# module Int = struct
+  type t = int
+  let compare = fun x y -> x-y
+end ;;
+
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t ;;
+
+let l1 = [100;30;50] ;;
+let res = List.fold_right (fun a b -> a -b ) 0 l1;;
+      module Int : sig type t = int val compare : int -> int -> int end
+#     module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+#   val l1 : int list = [100; 30; 50]
+# Characters 45-46:
+  let res = List.fold_right (fun a b -> a -b ) 0 l1;;
+                                               ^
+Error: This expression has type int but an expression was expected of type
+         int list
+# module Int = struct
+  type t = int
+  let compare = fun x y -> x-y
+end ;;
+
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t ;;
+
+let l1 = [100;30;50] ;;
+let res = List.fold_left (fun a b -> a -b ) 0 l1;;
+      module Int : sig type t = int val compare : int -> int -> int end
+#     module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+#   val l1 : int list = [100; 30; 50]
+# val res : int = -180
+# module Int = struct
+  type t = int
+  let compare = fun x y -> x-y
+end ;;
+
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t ;;
+
+let l1 = [100;30] ;;
+let res = List.fold_left (fun a b -> a -b ) 0 l1;;
+      module Int : sig type t = int val compare : int -> int -> int end
+#     module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+#   val l1 : int list = [100; 30]
+# val res : int = -130
+# module Int = struct
+  type t = int
+  let compare = fun x y -> x-y
+end ;;
+
+
+module IntSet = Set.Make (Int) ;;
+module IntMap= Map.Make (Int) ;;
+type graph = IntSet.t IntMap.t ;;
+
+
+let m = IntSet.empty;;
+      module Int : sig type t = int val compare : int -> int -> int end
+#     module IntSet :
+  sig
+    type elt = Int.t
+    type t = Set.Make(Int).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module IntMap :
+  sig
+    type key = Int.t
+    type 'a t = 'a Map.Make(Int).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+# type graph = IntSet.t IntMap.t
+#     val m : IntSet.t = <abstr>
+# module SSet = Set.Make (String) ;;
+let s = SSet.empty ;;
+
+let s = SSet.singleton "salut";;
+          
+List.fold_right SSet.add ["sa";"l";"ut";"cava";"qssas"] s;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+#   - : SSet.t = <abstr>
+# module SSet = Set.Make (String) ;;
+let s = SSet.empty ;;
+
+let s = SSet.singleton "salut";;
+          
+let __ = List.fold_right SSet.add ["sa";"l";"ut";"cava";"qssas"] s;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+#   val __ : SSet.t = <abstr>
+# module SSet = Set.Make (String) ;;
+let s = SSet.empty ;;
+
+let s = SSet.singleton "salut";;
+          
+let __ = List.fold_right SSet.add ["sa";"l";"ut";"cava";"qssas"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 3 ;;
+let s2 = SSet.filter myf s;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+#   val __ : SSet.t = <abstr>
+# salut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+# module SSet = Set.Make (String) ;;
+let s = SSet.empty ;;
+
+let s = SSet.singleton "salut";;
+          
+let __ = List.fold_right SSet.add ["sa";"l";"ut";"cava";"qssas"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 3 ;;
+let s2 = SSet.filter myf s;;
+
+SSet.mem "sa" s2;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+#   val __ : SSet.t = <abstr>
+# salut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+#   - : bool = false
+# module SSet = Set.Make (String) ;;
+let s = SSet.empty ;;
+
+let s = SSet.singleton "salut";;
+          
+let __ = List.fold_right SSet.add ["sa";"l";"ut";"cava";"qssas"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 3 ;;
+let s2 = SSet.filter myf s;;
+
+SSet.mem "cava" s2;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+#   val __ : SSet.t = <abstr>
+# salut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+#   - : bool = false
+# module SSet = Set.Make (String) ;;
+let s = SSet.empty ;;
+
+let s = SSet.singleton "salut";;
+          
+let __ = List.fold_right SSet.add ["sa";"l";"ut";"cava";"hello"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 5 ;;
+let s2 = SSet.filter myf s;;
+
+SSet.mem "hello" s2;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+#   val __ : SSet.t = <abstr>
+# salut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+#   - : bool = false
+# module SSet = Set.Make (String) ;;
+let s = SSet.empty ;;
+
+let s = SSet.singleton "salut";;
+          
+let s = List.fold_right SSet.add ["sa";"l";"ut";"cava";"hello"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 5 ;;
+let s2 = SSet.filter myf s;;
+
+SSet.mem "hello" s2;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+#   val s : SSet.t = <abstr>
+# cava
+hello
+l
+sa
+salut
+ut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+#   - : bool = true
+# module SSet = Set.Make (String) ;;
+module Users = Map.Make(String);;
+
+let s = SSet.empty ;;
+let s = SSet.singleton "salut";;       
+let s = List.fold_right SSet.add ["sa";"l";"ut";"cava";"hello"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 5 ;;
+let s2 = SSet.filter myf s;;
+
+SSet.mem "hello" s2;;
+
+let m = Users.empty;;
+let m = Users.add "fred" "machin" m ;;
+let m = Users.add "Vince" "Laroc" m ;;
+let m = Users.add "Peter" "Ofbridge" m ;;
+let m = Users.add "Jojo" "Cray"  m;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module Users :
+  sig
+    type key = String.t
+    type 'a t = 'a Map.Make(String).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+#   val s : SSet.t = <abstr>
+# val s : SSet.t = <abstr>
+# val s : SSet.t = <abstr>
+# cava
+hello
+l
+sa
+salut
+ut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+#   - : bool = true
+#   val m : 'a Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# module SSet = Set.Make (String) ;;
+module Users = Map.Make(String);;
+
+let s = SSet.empty ;;
+let s = SSet.singleton "salut";;       
+let s = List.fold_right SSet.add ["sa";"l";"ut";"cava";"hello"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 5 ;;
+let s2 = SSet.filter myf s;;
+
+SSet.mem "hello" s2;;
+
+let m = Users.empty;;
+let m = Users.add "fred" "machin" m ;;
+let m = Users.add "Vince" "Laroc" m ;;
+let m = Users.add "Peter" "Ofbridge" m ;;
+let m = Users.add "Jojo" "Cray"  m 
+let printu = Users.iter print_endline m;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module Users :
+  sig
+    type key = String.t
+    type 'a t = 'a Map.Make(String).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+#   val s : SSet.t = <abstr>
+# val s : SSet.t = <abstr>
+# val s : SSet.t = <abstr>
+# cava
+hello
+l
+sa
+salut
+ut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+#   - : bool = true
+#   val m : 'a Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+#   Characters 60-73:
+  let printu = Users.iter print_endline m;;
+                          ^^^^^^^^^^^^^
+Error: This expression has type Users.key -> unit
+       but an expression was expected of type Users.key -> 'a -> unit
+       Type unit is not compatible with type 'a -> unit 
+# module SSet = Set.Make (String) ;;
+module Users = Map.Make(String);;
+
+let s = SSet.empty ;;
+let s = SSet.singleton "salut";;       
+let s = List.fold_right SSet.add ["sa";"l";"ut";"cava";"hello"] s;;
+let print_set = SSet.iter print_endline s ;;
+
+let myf str =
+  String.length str <= 5 ;;
+let s2 = SSet.filter myf s;;
+
+SSet.mem "hello" s2;;
+
+let m = Users.empty;;
+let m = Users.add "fred" "machin" m ;;
+let m = Users.add "Vince" "Laroc" m ;;
+let m = Users.add "Peter" "Ofbridge" m ;;
+let m = Users.add "Jojo" "Cray"  m;; 
+let printu = Users.iter print_endline m;;
+module SSet :
+  sig
+    type elt = String.t
+    type t = Set.Make(String).t
+    val empty : t
+    val is_empty : t -> bool
+    val mem : elt -> t -> bool
+    val add : elt -> t -> t
+    val singleton : elt -> t
+    val remove : elt -> t -> t
+    val union : t -> t -> t
+    val inter : t -> t -> t
+    val diff : t -> t -> t
+    val compare : t -> t -> int
+    val equal : t -> t -> bool
+    val subset : t -> t -> bool
+    val iter : (elt -> unit) -> t -> unit
+    val fold : (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val for_all : (elt -> bool) -> t -> bool
+    val exists : (elt -> bool) -> t -> bool
+    val filter : (elt -> bool) -> t -> t
+    val partition : (elt -> bool) -> t -> t * t
+    val cardinal : t -> int
+    val elements : t -> elt list
+    val min_elt : t -> elt
+    val max_elt : t -> elt
+    val choose : t -> elt
+    val split : elt -> t -> t * bool * t
+    val find : elt -> t -> elt
+    val of_list : elt list -> t
+  end
+# module Users :
+  sig
+    type key = String.t
+    type 'a t = 'a Map.Make(String).t
+    val empty : 'a t
+    val is_empty : 'a t -> bool
+    val mem : key -> 'a t -> bool
+    val add : key -> 'a -> 'a t -> 'a t
+    val singleton : key -> 'a -> 'a t
+    val remove : key -> 'a t -> 'a t
+    val merge :
+      (key -> 'a option -> 'b option -> 'c option) -> 'a t -> 'b t -> 'c t
+    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
+    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
+    val iter : (key -> 'a -> unit) -> 'a t -> unit
+    val fold : (key -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+    val for_all : (key -> 'a -> bool) -> 'a t -> bool
+    val exists : (key -> 'a -> bool) -> 'a t -> bool
+    val filter : (key -> 'a -> bool) -> 'a t -> 'a t
+    val partition : (key -> 'a -> bool) -> 'a t -> 'a t * 'a t
+    val cardinal : 'a t -> int
+    val bindings : 'a t -> (key * 'a) list
+    val min_binding : 'a t -> key * 'a
+    val max_binding : 'a t -> key * 'a
+    val choose : 'a t -> key * 'a
+    val split : key -> 'a t -> 'a t * 'a option * 'a t
+    val find : key -> 'a t -> 'a
+    val map : ('a -> 'b) -> 'a t -> 'b t
+    val mapi : (key -> 'a -> 'b) -> 'a t -> 'b t
+  end
+#   val s : SSet.t = <abstr>
+# val s : SSet.t = <abstr>
+# val s : SSet.t = <abstr>
+# cava
+hello
+l
+sa
+salut
+ut
+val print_set : unit = ()
+#     val myf : string -> bool = <fun>
+# val s2 : SSet.t = <abstr>
+#   - : bool = true
+#   val m : 'a Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# val m : string Users.t = <abstr>
+# Characters 24-37:
+  let printu = Users.iter print_endline m;;
+                          ^^^^^^^^^^^^^
+Error: This expression has type Users.key -> unit
+       but an expression was expected of type Users.key -> 'a -> unit
+       Type unit is not compatible with type 'a -> unit 
+# 
