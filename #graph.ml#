@@ -1,0 +1,32 @@
+module Int =
+struct
+  type t = int
+  let compare = fun x y -> x - y
+end ;;
+
+Exception Not_found ;;
+
+module ISet = Set.Make(Int);;
+module IMap = Map.Make(Int);;
+(* type graphe *)
+type graph = ISet.t IMap.t;;
+
+(*initialisation  *)
+let s = ISet.empty;;
+let s = ISet.add 1 ;;
+let s = ISet.add 8 ;;
+let s = ISet.add 3 ;;
+let s = ISet.add 55 ;;
+(*affichage du set *)
+let printset s = ISet.iter print_int s ;;
+
+
+
+
+
+
+(*let foldnub l = 
+List.fold_left ( match l with 
+| e::ll -> if acc <> e then   )  acc l  *)
+
+(*let addvertex a  = Iset.add a ;;*)
